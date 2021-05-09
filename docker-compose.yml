@@ -1,0 +1,43 @@
+version: '3'
+
+services:
+
+  novnc:
+
+    # VNC Client 1 : Variables
+    #container_name: vnc_client1
+    #hostname: vnc_client1
+    # command: --vnc 172.18.0.2:5901
+    # VNC Client 1 : Constants
+    image: gotget/novnc
+    restart: always
+    expose:
+      - 6080/tcp
+    # ports:
+    #   - 6080:6080
+
+  centos:
+    image: consol/centos-xfce-vnc
+    ports:
+      - 5901:5901
+    environment:
+      VNC_RESOLUTION: '800x600'
+
+  web:
+    image: nginx:latest
+    volumes:
+      - ./noVNC:/srv/www/noVNC:z
+      - ./default.conf:/etc/nginx/conf.d/default.conf
+      
+    restart: always
+    ports:
+      - 80:80      # HTTP
+  #     - 443:443    # HTTPS
+
+  websockify:
+    image: efrecon/websockify
+    command: 80 centos:5901
+    ports:
+      - 8080:80
+
+                    
